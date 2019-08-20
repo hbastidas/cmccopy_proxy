@@ -1,7 +1,7 @@
 var request = require("request");
 var cheerio = require("cheerio");
 
-
+const ProjectName="copy MarketCap";
 
 var express = require('express');
 var app = express();
@@ -10,7 +10,7 @@ var app = express();
 var options = {
   dotfiles: 'ignore',
   etag: false,
-  extensions: ['css', 'json', 'js', 'ico'],
+  extensions: ['css', 'json', 'js', 'ico', 'png'],
   index: false,
   maxAge: '1d',
   redirect: false,
@@ -21,84 +21,70 @@ var options = {
 app.use(express.static(__dirname + '/public', options));
 
 
-app.get('/:page', function (req, res) {
-  var page = req.params.page;
-  console.log("aqui "+page)
+async function removeElements($){
+  $(".cmc-newsletter-signup").remove()
+  //$("script").remove();
+  $("[id*='ad']").remove()
+  return $;
+}
 
-  request({
-    uri: "https://coinmarketcap.com/"+page,
-  }, async function(error, response, body) {
-    var $ = cheerio.load(body);
-    //$("script").remove();
-    $("[id*='ad']").remove()
-  });
-
-});
-
-app.get('/:page/:currency', function (req, res) {
-  var page = req.params.page;
-  var currency = req.params.currency;
+async function reemplaceElements($){
+  var replace_str = $('body').html().replace(/CoinMarketCap/g,ProjectName);
+  $('body').html(replace_str);
 
 
-  request({
-    uri: "https://coinmarketcap.com/"+page+"/"+currency,
-  }, async function(error, response, body) {
-    var $ = cheerio.load(body);
-    //$("script").remove();
-    $("[id*='ad']").remove()
+  //reemplace elements in js
 
 
-/*
-    await $("*[src]").each(function() {
-      var src = $(this);
-      var text = src.attr("src");
-      src.attr("src", "https://coinmarketcap.com/"+text);
-    });
 
-    await $("link[href]").each(function() {
-      var src = $(this);
-      var url = src.attr("href");
-      if(url[0]!="/" && url[0]!="h"){
-        src.attr("href", "https://coinmarketcap.com/"+url);
-      }
-
-    });
-*/
-
-  });
-
-});
+  return $
+}
 
 
 app.get('/', function (req, res) {
-
   request({
     uri: "https://coinmarketcap.com/",
   }, async function(error, response, body) {
     var $ = cheerio.load(body);
 
+    $=await removeElements($);
+    $=await reemplaceElements($);
 
-    //$("script").remove();
-    $("[id*='ad']").remove()
 
 
-    await $("*[src]").each(function() {
+
+    await $("script[src]").each(function() {
       var src = $(this);
       var text = src.attr("src");
 
-
       var re = new RegExp(/(https:\/\/s2\.coinmarketcap\.com\/static\/cloud\/compressed\/)+(base+\.).+(js)/,'g'); // notacion literal
       var re2 = new RegExp(/(https:\/\/s2\.coinmarketcap\.com\/static\/cloud\/compressed\/)+(basehead+\.).+(js)/,'g'); // notacion literal
+      var re3 = new RegExp(/(https:\/\/s2\.coinmarketcap\.com\/static\/cloud\/compressed\/)+(currencies_main+\.).+(js)/,'g'); // notacion literal
+      var re4 = new RegExp(/(https:\/\/s2\.coinmarketcap\.com\/static\/cloud\/compressed\/)+(prebid+\.).+(js)/,'g'); // notacion literal
+      var re5 = new RegExp(/(https:\/\/s2\.coinmarketcap\.com\/static\/cloud\/compressed\/)+(currencies_top+\.).+(js)/,'g'); // notacion literal
       if(text.match(re)!=null){
-        console.log(text.match(re))
         src.attr("src", "base.js");
-      }else if (text.match(re2)!=null) {
-        console.log(text.match(re2))
+        src.attr("notremove", "true");
+      }
+
+      if (text.match(re2)!=null) {
         src.attr("src", "basehead.js");
-      }else{
-        //al parecer son imagenes
-        //console.log(text)
-        //$(this).remove()
+        src.attr("notremove", "true");
+      }
+
+      if (text.match(re3)!=null) {
+        src.attr("src", "currencies_main.js");
+        src.attr("notremove", "true");
+      }
+
+      if (text.match(re4)!=null) {
+        src.attr("src", "prebid.js");
+        src.attr("notremove", "true");
+      }
+
+      if (text.match(re5)!=null) {
+        src.attr("src", "currencies_top.js");
+        src.attr("notremove", "true");
       }
       //src.attr("src", "https://coinmarketcap.com/"+text);
     });
@@ -113,6 +99,9 @@ app.get('/', function (req, res) {
       }
 
     });
+
+    //$("script[notremove!=true]").remove()
+    $("body").prepend($("<script>").attr("src", "inyect.js"))
 
 
     res.send($.html());
