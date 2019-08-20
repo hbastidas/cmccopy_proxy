@@ -1,0 +1,26 @@
+
+{
+  "short_name": "CMC",
+  "name": "CoinMarketCap",
+  "icons": [
+    {
+      "src": "https://s2.coinmarketcap.com/static/cloud/img/logo_192x192_1.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "https://s2.coinmarketcap.com/static/cloud/img/logo_512x512_1.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "prefer_related_applications": true,
+  "related_applications": [
+    {
+      "platform": "play",
+      "id": "com.coinmarketcap.android"
+    }
+  ],
+  "display": "standalone",
+  "start_url": "/?utm_source=androidappinstallbanner"
+}
