@@ -25,6 +25,11 @@ async function removeElements($){
   $(".cmc-newsletter-signup").remove()
   //$("script").remove();
   $("[id*='ad']").remove()
+
+  //remove donations
+  $("[data-target='#donate_eth']").parent("li").remove()
+  $("[data-target='#donate_ltc']").parent("li").remove()
+  $("[data-target='#donate_bch']").parent("li").remove()
   return $;
 }
 
@@ -32,7 +37,7 @@ async function reemplaceElements($){
   var replace_str = $('body').html().replace(/CoinMarketCap/g,ProjectName);
   $('body').html(replace_str);
 
-
+  $("[data-target='#donate_btc']").text("32pXF4Bn7gjBcBw9rfbqL22fFfWtkBW9wz")
   //reemplace elements in js
 
   await $("script[src]").each(function() {
