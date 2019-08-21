@@ -86,6 +86,7 @@ async function reemplaceElements($){
 
 async function inyectElements($){
   $("body").prepend($("<script>").attr("src", "/inyect.js"))
+  $("#category-tabs.nav-tabs").append($("<li>").attr("role", "presentation").append($("<a>").text("Latam").attr("href","/latam")))
   return $
 }
 
@@ -105,6 +106,11 @@ app.get('/', function (req, res) {
 
 app.get('/:lv1', function (req, res) {
   var level1 = req.params.lv1;
+
+  if(level1=="latam"){
+    return res.send("proximamente!");
+  }
+  
   request({
     uri: "https://coinmarketcap.com/"+level1
   }, async function(error, response, body) {
