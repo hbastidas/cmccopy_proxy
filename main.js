@@ -35,8 +35,57 @@ async function reemplaceElements($){
 
   //reemplace elements in js
 
+  await $("script[src]").each(function() {
+    var src = $(this);
+    var text = src.attr("src");
 
+    var re = new RegExp(/(https:\/\/s2\.coinmarketcap\.com\/static\/cloud\/compressed\/)+(base+\.).+(js)/,'g'); // notacion literal
+    var re2 = new RegExp(/(https:\/\/s2\.coinmarketcap\.com\/static\/cloud\/compressed\/)+(basehead+\.).+(js)/,'g'); // notacion literal
+    var re3 = new RegExp(/(https:\/\/s2\.coinmarketcap\.com\/static\/cloud\/compressed\/)+(currencies_main+\.).+(js)/,'g'); // notacion literal
+    var re4 = new RegExp(/(https:\/\/s2\.coinmarketcap\.com\/static\/cloud\/compressed\/)+(prebid+\.).+(js)/,'g'); // notacion literal
+    var re5 = new RegExp(/(https:\/\/s2\.coinmarketcap\.com\/static\/cloud\/compressed\/)+(currencies_top+\.).+(js)/,'g'); // notacion literal
+    if(text.match(re)!=null){
+      src.attr("src", "/base.js");
+      src.attr("notremove", "true");
+    }
 
+    if (text.match(re2)!=null) {
+      src.attr("src", "/basehead.js");
+      src.attr("notremove", "true");
+    }
+
+    if (text.match(re3)!=null) {
+      src.attr("src", "/currencies_main.js");
+      src.attr("notremove", "true");
+    }
+
+    if (text.match(re4)!=null) {
+      src.attr("src", "/prebid.js");
+      src.attr("notremove", "true");
+    }
+
+    if (text.match(re5)!=null) {
+      src.attr("src", "/currencies_top.js");
+      src.attr("notremove", "true");
+    }
+    //src.attr("src", "https://coinmarketcap.com/"+text);
+  });
+
+  await $("link[href]").each(function() {
+    var src = $(this);
+    var url = src.attr("href");
+
+    var re = new RegExp(/(https:\/\/s2\.coinmarketcap\.com\/static\/cloud\/compressed\/)+(base).*?.(css)/,'g'); // notacion literal
+    if(url.match(re)!=null){
+      src.attr("href", "/main.css");
+    }
+
+  });
+  return $
+}
+
+async function inyectElements($){
+  $("body").prepend($("<script>").attr("src", "/inyect.js"))
   return $
 }
 
@@ -46,67 +95,74 @@ app.get('/', function (req, res) {
     uri: "https://coinmarketcap.com/",
   }, async function(error, response, body) {
     var $ = cheerio.load(body);
-
     $=await removeElements($);
     $=await reemplaceElements($);
-
-
-
-
-    await $("script[src]").each(function() {
-      var src = $(this);
-      var text = src.attr("src");
-
-      var re = new RegExp(/(https:\/\/s2\.coinmarketcap\.com\/static\/cloud\/compressed\/)+(base+\.).+(js)/,'g'); // notacion literal
-      var re2 = new RegExp(/(https:\/\/s2\.coinmarketcap\.com\/static\/cloud\/compressed\/)+(basehead+\.).+(js)/,'g'); // notacion literal
-      var re3 = new RegExp(/(https:\/\/s2\.coinmarketcap\.com\/static\/cloud\/compressed\/)+(currencies_main+\.).+(js)/,'g'); // notacion literal
-      var re4 = new RegExp(/(https:\/\/s2\.coinmarketcap\.com\/static\/cloud\/compressed\/)+(prebid+\.).+(js)/,'g'); // notacion literal
-      var re5 = new RegExp(/(https:\/\/s2\.coinmarketcap\.com\/static\/cloud\/compressed\/)+(currencies_top+\.).+(js)/,'g'); // notacion literal
-      if(text.match(re)!=null){
-        src.attr("src", "base.js");
-        src.attr("notremove", "true");
-      }
-
-      if (text.match(re2)!=null) {
-        src.attr("src", "basehead.js");
-        src.attr("notremove", "true");
-      }
-
-      if (text.match(re3)!=null) {
-        src.attr("src", "currencies_main.js");
-        src.attr("notremove", "true");
-      }
-
-      if (text.match(re4)!=null) {
-        src.attr("src", "prebid.js");
-        src.attr("notremove", "true");
-      }
-
-      if (text.match(re5)!=null) {
-        src.attr("src", "currencies_top.js");
-        src.attr("notremove", "true");
-      }
-      //src.attr("src", "https://coinmarketcap.com/"+text);
-    });
-
-    await $("link[href]").each(function() {
-      var src = $(this);
-      var url = src.attr("href");
-
-      var re = new RegExp(/(https:\/\/s2\.coinmarketcap\.com\/static\/cloud\/compressed\/)+(base).*?.(css)/,'g'); // notacion literal
-      if(url.match(re)!=null){
-        src.attr("href", "main.css");
-      }
-
-    });
-
+    $=await inyectElements($);
     //$("script[notremove!=true]").remove()
-    $("body").prepend($("<script>").attr("src", "inyect.js"))
-
-
     res.send($.html());
   });
+});
 
+app.get('/:lv1', function (req, res) {
+  var level1 = req.params.lv1;
+  request({
+    uri: "https://coinmarketcap.com/"+level1
+  }, async function(error, response, body) {
+    var $ = cheerio.load(body);
+    $=await removeElements($);
+    $=await reemplaceElements($);
+    $=await inyectElements($);
+    //$("script[notremove!=true]").remove()
+    res.send($.html());
+  });
+});
+
+app.get('/:lv1/:lv2', function (req, res) {
+  var level1 = req.params.lv1;
+  var level2 = req.params.lv2;
+  request({
+    uri: "https://coinmarketcap.com/"+level1+"/"+level2
+  }, async function(error, response, body) {
+    var $ = cheerio.load(body);
+    $=await removeElements($);
+    $=await reemplaceElements($);
+    $=await inyectElements($);
+    //$("script[notremove!=true]").remove()
+    res.send($.html());
+  });
+});
+
+app.get('/:lv1/:lv2/:lv3', function (req, res) {
+  var level1 = req.params.lv1;
+  var level2 = req.params.lv2;
+  var level3 = req.params.lv3;
+  request({
+    uri: "https://coinmarketcap.com/"+level1+"/"+level2+"/"+level3
+  }, async function(error, response, body) {
+    var $ = cheerio.load(body);
+    $=await removeElements($);
+    $=await reemplaceElements($);
+    $=await inyectElements($);
+    //$("script[notremove!=true]").remove()
+    res.send($.html());
+  });
+});
+
+app.get('/:lv1/:lv2/:lv3/:lv4', function (req, res) {
+  var level1 = req.params.lv1;
+  var level2 = req.params.lv2;
+  var level3 = req.params.lv3;
+  var level4 = req.params.lv4;
+  request({
+    uri: "https://coinmarketcap.com/"+level1+"/"+level2+"/"+level3+"/"+level4
+  }, async function(error, response, body) {
+    var $ = cheerio.load(body);
+    $=await removeElements($);
+    $=await reemplaceElements($);
+    $=await inyectElements($);
+    //$("script[notremove!=true]").remove()
+    res.send($.html());
+  });
 });
 
 app.listen(3000, function () {
