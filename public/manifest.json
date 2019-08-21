@@ -4,7 +4,7 @@
   "name": "CoinMarketCap",
   "icons": [
     {
-      "src": "https://s2.coinmarketcap.com/static/cloud/img/logo_192x192_1.png",
+      "src": "/192x192.png",
       "type": "image/png",
       "sizes": "192x192"
     },

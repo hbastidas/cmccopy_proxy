@@ -38,6 +38,9 @@ async function reemplaceElements($){
   $('body').html(replace_str);
 
   $("[data-target='#donate_btc']").text("32pXF4Bn7gjBcBw9rfbqL22fFfWtkBW9wz")
+  $("meta[property='og:image']").attr("content", "/img/splash.png")
+  $("meta[property='og:site_name']").attr("content", ProjectName)
+  $("meta[property='og:title']").attr("content", "Cryptocurrency Market Capitalizations")
   //reemplace elements in js
 
   await $("script[src]").each(function() {
