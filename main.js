@@ -1,7 +1,7 @@
 var request = require("request");
 var cheerio = require("cheerio");
 
-const ProjectName="copy MarketCap";
+const ProjectName="marketcapve";
 
 var express = require('express');
 var app = express();
@@ -21,7 +21,7 @@ var options = {
 app.use(express.static(__dirname + '/public', options));
 
 
-async function removeElements($){
+async function removeElements($, level){
   $(".cmc-newsletter-signup").remove()
   //$("script").remove();
   $("[id*='ad']").remove()
@@ -30,6 +30,15 @@ async function removeElements($){
   $("[data-target='#donate_eth']").parent("li").remove()
   $("[data-target='#donate_ltc']").parent("li").remove()
   $("[data-target='#donate_bch']").parent("li").remove()
+  //remove liks for all
+  $("a[href='/all/views/all/']").remove()
+  $("a[href='/watchlist/']").parent('li').remove()
+  if(typeof level !== 'undefined'){
+    $("a[href='/"+level+"/all/views/all/']").remove()
+    $("a[href='/"+level+"/watchlist/']").parent('li').remove()
+  }
+
+  $("[data-watchlist-add]").parent("li").remove()
   return $;
 }
 
@@ -119,7 +128,7 @@ app.get('/:lv1', function (req, res) {
     uri: "https://coinmarketcap.com/"+level1
   }, async function(error, response, body) {
     var $ = cheerio.load(body);
-    $=await removeElements($);
+    $=await removeElements($, level1);
     $=await reemplaceElements($);
     $=await inyectElements($);
     //$("script[notremove!=true]").remove()
@@ -134,7 +143,7 @@ app.get('/:lv1/:lv2', function (req, res) {
     uri: "https://coinmarketcap.com/"+level1+"/"+level2
   }, async function(error, response, body) {
     var $ = cheerio.load(body);
-    $=await removeElements($);
+    $=await removeElements($, level1);
     $=await reemplaceElements($);
     $=await inyectElements($);
     //$("script[notremove!=true]").remove()
