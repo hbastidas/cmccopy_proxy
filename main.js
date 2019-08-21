@@ -38,6 +38,8 @@ async function reemplaceElements($){
   $('body').html(replace_str);
 
   $("[data-target='#donate_btc']").text("32pXF4Bn7gjBcBw9rfbqL22fFfWtkBW9wz")
+  $("#donate_btc > div > div > div.modal-body.text-center > strong").text("32pXF4Bn7gjBcBw9rfbqL22fFfWtkBW9wz")
+  $("#donate_btc > div > div > div.modal-body.text-center > img").attr("src", "https://chart.googleapis.com/chart?chs=325x325&cht=qr&chl=32pXF4Bn7gjBcBw9rfbqL22fFfWtkBW9wz&choe=UTF-8")
   $("meta[property='og:image']").attr("content", "/img/splash.png")
   $("meta[property='og:site_name']").attr("content", ProjectName)
   $("meta[property='og:title']").attr("content", "Cryptocurrency Market Capitalizations")
